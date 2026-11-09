@@ -444,32 +444,15 @@ def run_flask():
   port = int(os.environ.get("PORT", 10000))
   app.run(host="0.0.0.0", port=port)
 
-if __name__ == "__main__":
-    # Check if we're running in production (webhook) or development (polling) mode
-    webhook_url = os.getenv('WEBHOOK_URL')
-    
-    if webhook_url:
-        # Production mode: Use webhook
-        print("🚀 Starting bot in webhook mode...")
-        threading.Thread(target=run_flask).start()
-        try:
-            bot.remove_webhook()
-            bot.set_webhook(url=webhook_url)
-            print(f"✅ Webhook set to: {webhook_url}")
-        except Exception as e:
-            print(f"❌ Error setting webhook: {e}")
-    else:
-        # Development mode: Use polling
-        print("🚀 Starting bot in polling mode (development)...")
-        try:
-            # Remove any existing webhook first
-            bot.remove_webhook()
-            print("✅ Removed existing webhooks")
-            
-            # Start polling
-            print("🔄 Bot is running... Press Ctrl+C to stop.")
-            bot.infinity_polling(none_stop=True, timeout=10, long_polling_timeout=5)
-        except KeyboardInterrupt:
-            print("\n👋 Bot stopped by user.")
-        except Exception as e:
-            print(f"❌ Error in polling mode: {e}")
+    if __name__ == "__main__":
+  # 1. تشغيل خادم Flask في الخلفية ليبقى البوت نشطاً على Render
+  threading.Thread(target=run_flask, daemon=True).start()
+
+  # 2. تشغيل البوت بنظام الـ Polling مع معالجة الأخطاء
+  print("Starting bot polling...")
+  try:
+    bot.infinity_polling(
+        none_stop=True, timeout=10, long_polling_timeout=5
+    )
+  except Exception as e:
+    print(f"❌ Error in polling mode: {e}")
