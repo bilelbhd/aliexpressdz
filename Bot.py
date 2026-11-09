@@ -427,12 +427,13 @@ def handle_callback_query(call):
 # Flask app for handling webhook
 
 if __name__ == '__main__':
-  # 1. تشغيل خادم Flask في الخلفية
+  # 1. في الخلفية تشغيل خادم Flask
   threading.Thread(target=run_flask, daemon=True).start()
 
-  # 2. مسح أي Webhook قديم عالق لضمان عمل الـ Polling بنجاح
+  # 2. لضمان عدم وجود أي Webhook قديم معلق Polling
   bot.remove_webhook()
-  # 3. تشغيل البوت مع تحديد مهلات زمنية واضحة للاتصال
+
+  # 3. تشغيل البوت مع تعديلات مهلات زمنية واسعة للاتصال
   print('Starting bot polling...')
   while True:
     try:
@@ -444,4 +445,4 @@ if __name__ == '__main__':
       )
     except Exception as e:
       print(f'❌ Error in polling mode: {e}')
-      time.sleep(5)  # الانتظار 5 ثوانٍ قبل إعادة المحاولة تلقائياً عند أي انقطاع
+      time.sleep(5)
