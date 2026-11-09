@@ -8,17 +8,27 @@ from telebot import types
 from aliexpress_api import AliexpressApi, models
 from dotenv import load_dotenv
 # الخادم الوهمي لإرضاء منصة الاستضافة (Render)
-app = Flask('')
+app = Flask(__name__)
 
-@app.route('/')
+
+@app.route("/")
 def home():
-    return "Bot is running!"
+  return "Bot is running!"
 
-def run():
-    port = int(os.environ.get("PORT", 8080))
-    app.run(host='0.0.0.0', port=port)
 
-threading.Thread(target=run).start()
+# دالة تشغيل البوت
+def run_bot():
+  bot.infinity_polling()
+
+
+if __name__ == "__main__":
+  # تشغيل البوت في مسار منفصل (Thread)
+  t = threading.Thread(target=run_bot)
+  t.start()
+
+  # تشغيل خادم Flask على المنفذ المطلوب من المنصة
+  port = int(os.environ.get("PORT", 10000))
+  app.run(host="0.0.0.0", port=port)
 
 # Load environment variables from .env file
 load_dotenv()
