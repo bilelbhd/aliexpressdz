@@ -444,7 +444,7 @@ def run_flask():
   port = int(os.environ.get("PORT", 10000))
   app.run(host="0.0.0.0", port=port)
 
-    if __name__ == "__main__":
+if __name__ == "__main__":
   # 1. تشغيل خادم Flask في الخلفية ليبقى البوت نشطاً على Render
   threading.Thread(target=run_flask, daemon=True).start()
 
