@@ -1,6 +1,7 @@
 import os
 import json
 import threading
+import time
 import re
 from flask import Flask, request
 import telebot
@@ -426,14 +427,20 @@ def handle_callback_query(call):
 
 # Flask app for handling webhook
 
+import threading
+import time
+
 if __name__ == '__main__':
-  # 1. في الخلفية تشغيل خادم Flask
+  # 1. تشغيل خادم Flask في الخلفية لضمان استجابة موقع Render
   threading.Thread(target=run_flask, daemon=True).start()
 
-  # 2. لضمان عدم وجود أي Webhook قديم معلق Polling
-  bot.remove_webhook()
+  # 2. إزالة أي Webhook قديم عالق قبل تشغيل الـ Polling
+  try:
+    bot.remove_webhook()
+  except Exception as e:
+    print(f'Error removing webhook: {e}')
 
-  # 3. تشغيل البوت مع تعديلات مهلات زمنية واسعة للاتصال
+  # 3. تشغيل البوت بنظام Polling المستمر مع ضبط المهلات الزمنية
   print('Starting bot polling...')
   while True:
     try:
