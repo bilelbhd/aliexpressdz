@@ -7,57 +7,54 @@ import telebot
 from telebot import types
 from aliexpress_api import AliexpressApi, models
 from dotenv import load_dotenv
-# الخادم الوهمي لإرضاء منصة الاستضافة (Render)
+
+# 1. تحميل متغيرات البيئة أولاً
+load_dotenv()
+
+# 2. قراءة التوكن وتعريف البوت فوراً ليكون جاهزاً
+TELEGRAM_TOKEN_BOT = os.getenv('TELEGRAM_BOT_TOKEN')
+bot = telebot.TeleBot(TELEGRAM_TOKEN_BOT)
+
+try:
+  aliexpress = AliexpressApi(
+      os.getenv('ALEXPRESS_API_PUBLIC'),
+      os.getenv('ALEXPRESS_API_SECRET'),
+      models.Language.AR,
+      models.Currency.EUR,
+      'bilel213',
+  )
+  print('AliExpress API initialized successfully.')
+except Exception as e:
+  print(f'Error initializing AliExpress API: {e}')
+
+# 3. إعداد تطبيق الفلاسك (Flask)
 app = Flask(__name__)
 
 
-@app.route("/")
+@app.route('/')
 def home():
-  return "Bot is running!"
+  return 'Bot is running!'
 
 
-# دالة تشغيل البوت
+# 4. دالة تشغيل البوت
 def run_bot():
-  bot.infinity_polling()
+  try:
+    print('Starting bot polling...')
+    bot.infinity_polling(none_stop=True, timeout=10, long_polling_timeout=5)
+  except Exception as e:
+    print(f'Error in polling: {e}')
 
 
-if __name__ == "__main__":
-  # تشغيل البوت في مسار منفصل (Thread)
-  t = threading.Thread(target=run_bot)
-  t.start()
+# 5. تشغيل السيرفر
+def run_flask():
+  port = int(os.environ.get('PORT', 10000))
+  app.run(host='0.0.0.0', port=port)
 
-  # تشغيل خادم Flask على المنفذ المطلوب من المنصة
-  port = int(os.environ.get("PORT", 10000))
-  app.run(host="0.0.0.0", port=port)
 
-# Load environment variables from .env file
-load_dotenv()
-
-# Initialize the bot with the token
-TELEGRAM_TOKEN_BOT = os.getenv('TELEGRAM_BOT_TOKEN')
-ALIEXPRESS_API_PUBLIC = os.getenv('ALIEXPRESS_API_PUBLIC')
-ALIEXPRESS_API_SECRET = os.getenv('ALIEXPRESS_API_SECRET')
-
-# Check if required environment variables are set
-if not TELEGRAM_TOKEN_BOT:
-    print("❌ Error: TELEGRAM_BOT_TOKEN environment variable is not set!")
-    print("Please set the environment variable or create a .env file with your bot token.")
-    exit(1)
-
-if not ALIEXPRESS_API_PUBLIC or not ALIEXPRESS_API_SECRET:
-    print("❌ Error: ALIEXPRESS_API_PUBLIC and ALIEXPRESS_API_SECRET environment variables are not set!")
-    print("Please set the environment variables or create a .env file with your API credentials.")
-    exit(1)
-
-bot = telebot.TeleBot(TELEGRAM_TOKEN_BOT)
-
-# Initialize Aliexpress API
-try:
-    aliexpress = AliexpressApi(ALIEXPRESS_API_PUBLIC, ALIEXPRESS_API_SECRET,
-                               models.Language.AR, models.Currency.EUR, 'bilel213')
-    print("AliExpress API initialized successfully.")
-except Exception as e:
-    print(f"Error initializing AliExpress API: {e}")
+if __name__ == '__main__':
+  # تشغيل السيرفر في مسار خلفي والبوت معاً
+  threading.Thread(target=run_flask, daemon=True).start()
+  run_bot()
 
 # Define keyboards
 keyboardStart = types.InlineKeyboardMarkup(row_width=1)
@@ -428,21 +425,6 @@ def handle_callback_query(call):
         print(f"Error in handle_callback_query: {e}")
 
 # Flask app for handling webhook
-
-app = Flask(__name__)
-
-@app.route('/webhook', methods=['POST'])
-def webhook():
-    if request.method == 'POST':
-        json_str = request.get_data().decode('UTF-8')
-        update = telebot.types.Update.de_json(json_str)
-        bot.process_new_updates([update])
-        return 'OK', 200
-
-# Start Flask app in a separate thread
-def run_flask():
-  port = int(os.environ.get("PORT", 10000))
-  app.run(host="0.0.0.0", port=port)
 
 if __name__ == "__main__":
   # 1. تشغيل خادم Flask في الخلفية ليبقى البوت نشطاً على Render
