@@ -430,9 +430,9 @@ if __name__ == '__main__':
   # 1. تشغيل خادم Flask في الخلفية
   threading.Thread(target=run_flask, daemon=True).start()
 
- # مسح أي Webhook قديم عالق لضمان عمل الـ Polling بنجاح
- bot.remove_webhook()
-  # 2. تشغيل البوت مع تحديد مهلات زمنية واضحة للاتصال
+  # 2. مسح أي Webhook قديم عالق لضمان عمل الـ Polling بنجاح
+  bot.remove_webhook()
+  # 3. تشغيل البوت مع تحديد مهلات زمنية واضحة للاتصال
   print('Starting bot polling...')
   while True:
     try:
