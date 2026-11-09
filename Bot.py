@@ -1,15 +1,24 @@
+import os
 import json
-import telebot
-from flask import Flask, request
 import threading
+import re
+from flask import Flask, request
+import telebot
 from telebot import types
 from aliexpress_api import AliexpressApi, models
-import re
-import os
-from urllib.parse import urlparse, parse_qs
-import urllib.parse
-import requests
 from dotenv import load_dotenv
+# الخادم الوهمي لإرضاء منصة الاستضافة (Render)
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "Bot is running!"
+
+def run():
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host='0.0.0.0', port=port)
+
+threading.Thread(target=run).start()
 
 # Load environment variables from .env file
 load_dotenv()
