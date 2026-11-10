@@ -42,11 +42,6 @@ def run_flask():
   port = int(os.environ.get('PORT', 10000))
   app.run(host='0.0.0.0', port=port)
 
-
-if __name__ == '__main__':
-  port = int(os.environ.get('PORT', 10000))
-  app.run(host='0.0.0.0', port=port)
-
 # Define keyboards
 keyboardStart = types.InlineKeyboardMarkup(row_width=1)
 btn1 = types.InlineKeyboardButton("⭐️ صفحة مراجعة وجمع النقاط يوميا ⭐️", url="https://s.click.aliexpress.com/e/_DdwUZVd")
@@ -417,15 +412,26 @@ def handle_callback_query(call):
 
 # Flask app for handling webhook
 
-@app.route(f'/{TOKEN}', methods=['POST'])
+# ===== Webhook =====
+import hashlib
+
+# مسار سري مشتق من التوكن، حتى لا يظهر التوكن نفسه في سجلات Render
+WEBHOOK_PATH = "/wh-" + hashlib.sha256(TELEGRAM_TOKEN_BOT.encode()).hexdigest()[:24]
+BASE_URL = os.environ.get("RENDER_EXTERNAL_URL", "https://aliexpressdz.onrender.com")
+
+@app.route(WEBHOOK_PATH, methods=["POST"])
 def webhook():
-  json_string = request.get_data().decode('utf-8')
-  update = telebot.types.Update.de_json(json_string)
-  bot.process_new_updates([update])
-  return '!', 200
+    json_string = request.get_data().decode("utf-8")
+    update = telebot.types.Update.de_json(json_string)
+    bot.process_new_updates([update])
+    return "OK", 200
 
+# يُسجَّل الـ webhook عند كل تشغيل
+bot.remove_webhook()
+bot.set_webhook(url=BASE_URL + WEBHOOK_PATH)
+print(f"Webhook set to {BASE_URL}{WEBHOOK_PATH}")
 
-if __name__ == '__main__':
-  port = int(os.environ.get('PORT', 10000))
-  print(f'Starting web server on port {port}...')
-  app.run(host='0.0.0.0', port=port)
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 10000))
+    print(f"Starting web server on port {port}...")
+    app.run(host="0.0.0.0", port=port)
