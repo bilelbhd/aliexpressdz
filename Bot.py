@@ -21,8 +21,8 @@ bot = telebot.TeleBot(TELEGRAM_TOKEN_BOT)
 
 try:
   aliexpress = AliexpressApi(
-      os.getenv('ALEXPRESS_API_PUBLIC'),
-      os.getenv('ALEXPRESS_API_SECRET'),
+      os.getenv('ALIEXPRESS_API_PUBLIC'),
+      os.getenv('ALIEXPRESS_API_SECRET'),
       models.Language.AR,
       models.Currency.EUR,
       'bilel213',
