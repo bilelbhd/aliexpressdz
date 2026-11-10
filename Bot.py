@@ -427,26 +427,15 @@ def handle_callback_query(call):
 
 # Flask app for handling webhook
 
+@app.route(f'/{TOKEN}', methods=['POST'])
+def webhook():
+  json_string = request.get_data().decode('utf-8')
+  update = telebot.types.Update.de_json(json_string)
+  bot.process_new_updates([update])
+  return '!', 200
+
+
 if __name__ == '__main__':
-  # 1. تشغيل خادم Flask في الخلفية لضمان استجابة موقع Render
-  threading.Thread(target=run_flask, daemon=True).start()
-
-  # 2. إزالة أي Webhook قديم عالق قبل تشغيل الـ Polling
-  try:
-    bot.remove_webhook()
-  except Exception as e:
-    print(f'Error removing webhook: {e}')
-
-  # 3. تشغيل البوت بنظام Polling المستمر مع ضبط المهلات الزمنية
-  print('Starting bot polling...')
-  while True:
-    try:
-      bot.infinity_polling(
-          none_stop=True,
-          interval=1,
-          timeout=20,
-          long_polling_timeout=20,
-      )
-    except Exception as e:
-      print(f'❌ Error in polling mode: {e}')
-      time.sleep(5)
+  port = int(os.environ.get('PORT', 10000))
+  print(f'Starting web server on port {port}...')
+  app.run(host='0.0.0.0', port=port)
