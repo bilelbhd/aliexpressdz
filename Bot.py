@@ -8,6 +8,9 @@ import telebot
 from telebot import types
 from aliexpress_api import AliexpressApi, models
 from dotenv import load_dotenv
+import requests
+import urllib.parse
+from urllib.parse import urlparse, parse_qs
 
 # 1. تحميل متغيرات البيئة أولاً
 load_dotenv()
