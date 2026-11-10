@@ -427,9 +427,6 @@ def handle_callback_query(call):
 
 # Flask app for handling webhook
 
-import threading
-import time
-
 if __name__ == '__main__':
   # 1. تشغيل خادم Flask في الخلفية لضمان استجابة موقع Render
   threading.Thread(target=run_flask, daemon=True).start()
