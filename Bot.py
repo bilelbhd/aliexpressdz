@@ -37,15 +37,6 @@ def home():
   return 'Bot is running!'
 
 
-# 4. دالة تشغيل البوت
-def run_bot():
-  try:
-    print('Starting bot polling...')
-    bot.infinity_polling(none_stop=True, timeout=10, long_polling_timeout=5)
-  except Exception as e:
-    print(f'Error in polling: {e}')
-
-
 # 5. تشغيل السيرفر
 def run_flask():
   port = int(os.environ.get('PORT', 10000))
