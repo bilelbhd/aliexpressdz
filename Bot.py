@@ -44,9 +44,8 @@ def run_flask():
 
 
 if __name__ == '__main__':
-  # تشغيل السيرفر في مسار خلفي والبوت معاً
-  threading.Thread(target=run_flask, daemon=True).start()
-  run_bot()
+  port = int(os.environ.get('PORT', 10000))
+  app.run(host='0.0.0.0', port=port)
 
 # Define keyboards
 keyboardStart = types.InlineKeyboardMarkup(row_width=1)
